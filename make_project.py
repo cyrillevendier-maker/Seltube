@@ -475,15 +475,29 @@ FILES = {
 }
 
 root = os.path.dirname(os.path.abspath(__file__))
+
+def ensure_dir(d):
+    """Cree le dossier d ; si un FICHIER du meme nom (ou d'un parent) gene, il est supprime."""
+    parts = os.path.relpath(d, root).split(os.sep)
+    cur = root
+    for part in parts:
+        if part in ("", "."):
+            continue
+        cur = os.path.join(cur, part)
+        if os.path.isfile(cur) or os.path.islink(cur):
+            os.remove(cur)
+        if not os.path.isdir(cur):
+            os.mkdir(cur)
+
 for rel, data in FILES.items():
     path = os.path.join(root, rel)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    ensure_dir(os.path.dirname(path))
     with open(path, "wb") as f:
         f.write(base64.b64decode(data))
 src = os.path.join(root, "selztube.html")
 if not os.path.exists(src):
     sys.exit("selztube.html est introuvable a la racine du depot")
 dst = os.path.join(root, "app", "src", "main", "assets", "selztube.html")
-os.makedirs(os.path.dirname(dst), exist_ok=True)
+ensure_dir(os.path.dirname(dst))
 shutil.copyfile(src, dst)
 print("Projet Android genere :", len(FILES) + 1, "fichiers")
