@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -23,6 +23,7 @@ jobs:
         run: python3 make_project.py
 
       - name: Embarquer les polices
+        continue-on-error: true
         run: python3 tools/fetch_fonts.py
 
       - name: Compiler l'APK
